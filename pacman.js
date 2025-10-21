@@ -102,15 +102,35 @@ class Pacman {
 
   changeDirectionIfPossible() {
     if (this.direction == this.nextDirection) return;
+
+    if (!this.isCentered()) {
+      return;
+    }
+
     let tempDirection = this.direction;
     this.direction = this.nextDirection;
     this.moveForwards();
+
     if (this.checkCollisions()) {
       this.moveBackwards();
       this.direction = tempDirection;
     } else {
       this.moveBackwards();
     }
+  }
+
+  isCentered() {
+    const centerThreshold = this.speed * 1.5;
+
+    const cellCenterX =
+      (Math.floor(this.x / oneBlockSize) + 0.5) * oneBlockSize;
+    const cellCenterY =
+      (Math.floor(this.y / oneBlockSize) + 0.5) * oneBlockSize;
+
+    const deltaX = Math.abs(this.x + this.width / 2 - cellCenterX);
+    const deltaY = Math.abs(this.y + this.height / 2 - cellCenterY);
+
+    return deltaX <= centerThreshold && deltaY <= centerThreshold;
   }
 
   getMapX() {

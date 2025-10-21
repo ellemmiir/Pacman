@@ -35,6 +35,7 @@ let gameOver = false;
 let gameWin = false;
 let gamePaused = false;
 
+
 let map = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
@@ -50,7 +51,7 @@ let map = [
   [1, 1, 1, 1, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1],
   [0, 0, 0, 0, 1, 2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 0, 0, 0, 0],
   [0, 0, 0, 0, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1],
   [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
   [1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1],
   [1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1],
@@ -62,6 +63,10 @@ let map = [
 ];
 
 const initialMap = map.map((row) => row.slice());
+
+// Подстроим canvas под игровое поле
+canvas.width = map[0].length * oneBlockSize;
+canvas.height = map.length * oneBlockSize + 50;
 
 let randomTargetsForGhosts = [
   { x: 1 * oneBlockSize, y: 1 * oneBlockSize },
@@ -121,7 +126,6 @@ let endGame = (won) => {
 };
 
 let restartGame = () => {
-
   map = initialMap.map((row) => row.slice());
 
   lives = 3;
@@ -164,19 +168,25 @@ let drawFoods = () => {
 };
 
 let drawRemainingLives = () => {
+  const offsetY = map.length * oneBlockSize + 10; 
+  const startX = 200; 
+
   canvasContext.font = "20px Emulogic";
   canvasContext.fillStyle = "white";
-  canvasContext.fillText("Lives: ", 220, oneBlockSize * (map.length + 1));
+  canvasContext.fillText("Lives: ", startX, offsetY + 20);
+
+  const iconSpacing = oneBlockSize + 2; 
+  const iconOffsetY = offsetY + 4; 
 
   for (let i = 0; i < lives; i++) {
     canvasContext.drawImage(
       pacmanFrames,
-      2 * oneBlockSize,
+      2 * oneBlockSize, 
       0,
       oneBlockSize,
       oneBlockSize,
-      350 + i * oneBlockSize,
-      oneBlockSize * map.length + 2,
+      startX + 70 + i * iconSpacing, 
+      iconOffsetY, 
       oneBlockSize,
       oneBlockSize
     );
@@ -184,26 +194,30 @@ let drawRemainingLives = () => {
 };
 
 let drawScore = () => {
+  const offsetY = map.length * oneBlockSize + 10;
   canvasContext.font = "20px Emulogic";
   canvasContext.fillStyle = "white";
-  canvasContext.fillText("Score: " + score, 20, oneBlockSize * (map.length + 1));
+  canvasContext.fillText("Score: " + score, 0, offsetY + 20);
 };
 
 let drawEndScreen = (text, color) => {
+  const gameWidth = map[0].length * oneBlockSize;
+  const gameHeight = map.length * oneBlockSize;
+
   canvasContext.fillStyle = "rgba(0,0,0,0.7)";
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 
   canvasContext.font = "40px Emulogic";
   canvasContext.fillStyle = color;
   canvasContext.textAlign = "center";
-  canvasContext.fillText(text, canvas.width / 2, canvas.height / 2 - 40);
+  canvasContext.fillText(text, gameWidth / 2, gameHeight / 2 - 40);
 
   canvasContext.font = "20px Emulogic";
   canvasContext.fillStyle = "white";
   canvasContext.fillText(
     "Press R to restart",
-    canvas.width / 2,
-    canvas.height / 2 + 40
+    gameWidth / 2,
+    gameHeight / 2 + 40
   );
 };
 
@@ -262,6 +276,9 @@ let drawWalls = () => {
 let draw = () => {
   canvasContext.clearRect(0, 0, canvas.width, canvas.height);
   createRect(0, 0, canvas.width, canvas.height, "black");
+
+  canvasContext.textAlign = "left";
+
   drawWalls();
   drawFoods();
   drawGhosts();
